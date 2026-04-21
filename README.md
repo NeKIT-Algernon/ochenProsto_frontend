@@ -1,48 +1,96 @@
-# ochenProsto_frontend
+# OchenProsto Frontend
 
-This template should help get you started developing with Vue 3 in Vite.
+Frontend для сайта доставки еды на `Vue 3` + `TypeScript` + `Vite`.
 
-## Recommended IDE Setup
+Сейчас в проекте:
+- базовый layout приложения
+- роутинг для 4 страниц
+- API-слой для работы с Directus
+- тестовый вывод категорий, баннеров, товаров и `site_settings`
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## Стек
 
-## Recommended Browser Setup
+- Vue 3
+- TypeScript
+- Vite
+- Vue Router
+- Pinia
+- Axios
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+## Запуск
 
-## Type Support for `.vue` Imports in TS
+Установить зависимости:
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
+```bash
 npm install
 ```
 
-### Compile and Hot-Reload for Development
+Создать локальный env-файл:
 
-```sh
+```bash
+cp .env.example .env
+```
+
+Запустить dev-сервер:
+
+```bash
 npm run dev
 ```
 
-### Type-Check, Compile and Minify for Production
+Проверить типы:
 
-```sh
+```bash
+npm run type-check
+```
+
+Собрать production-бандл:
+
+```bash
 npm run build
 ```
 
-### Lint with [ESLint](https://eslint.org/)
+## Переменные окружения
 
-```sh
-npm run lint
+Используется одна обязательная переменная:
+
+```env
+VITE_DIRECTUS_URL=http://localhost:8055
 ```
+
+## Роуты
+
+- `/` — главная страница
+- `/product` — страница товара
+- `/cart` — корзина
+- `/order` — оформление заказа
+
+## API
+
+API-слой лежит в [src/api](./src/api) и использует общий клиент [src/api/client.ts](./src/api/client.ts).
+
+Текущие методы:
+- `getCategories()`
+- `getBanners()`
+- `getProductsByCategory(categoryId)`
+- `getSiteSettings()`
+- `getAssetUrl(fileId)`
+
+## Структура
+
+Основные директории:
+- `src/api` — запросы к Directus и типы
+- `src/pages` — страницы
+- `src/components/layout` — layout-компоненты
+- `src/components/general` — общие UI-компоненты
+- `src/components/page_components` — компоненты по страницам
+- `src/assets/styles` — CSS-переменные
+
+## Текущее состояние
+
+Главная страница уже запрашивает:
+- баннеры
+- категории
+- товары по категориям
+
+Страница товара запрашивает:
+- `site_settings`

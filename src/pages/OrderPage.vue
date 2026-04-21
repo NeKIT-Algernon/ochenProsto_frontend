@@ -1,0 +1,3 @@
+<template>
+  Order page
+</template>
