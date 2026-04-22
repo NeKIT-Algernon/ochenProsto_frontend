@@ -37,7 +37,7 @@ export interface Product {
   fats: number
   carbs: number
   price: number
-  redprice: number
+  price_formatted: string
   isHidden: boolean
   isAvailable: boolean
 }
@@ -47,7 +47,6 @@ export interface Banner {
   sort: number
   name: string
   primary_photo: string | null
-  mobile_photo: string | null
 }
 
 export interface SiteSettings {
@@ -60,4 +59,13 @@ export interface SiteSettings {
   warning_text: string
   isWarning: boolean
   isClosed: boolean
+}
+
+export interface CartOrderItem {
+  id: number
+  product: number
+  quantity: number
+  name_snapshot: string
+  price_snapshot: number
+  total_price: number
 }

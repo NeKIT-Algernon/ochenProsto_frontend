@@ -1,13 +1,36 @@
-@import './base.css';
 @import './styles/variables.css';
 
-body {
+/* Обнуление стилей */
+* {
   margin: 0;
-  background-color: var(--color-background);
-  color: var(--color-text);
-  font-family: Arial, sans-serif;
+  padding: 0;
+  line-height: 1.5;
+  font: inherit;
+  text-decoration: none;
+  color: inherit;
 }
 
-#app {
-  min-height: 100vh;
+div {
+    box-sizing: border-box;
+}
+
+body {
+  background-color: var(--color-background-main);
+  height: 100%;
+  min-width: 320px;
+  color: var(--color-text-primary);
+  font-family: "Nunito Sans", sans-serif;
+  font-size: 16px;
+}
+
+h2 {
+  font-size: var(--font-size-h2);
+}
+
+/* Шрифты */
+@font-face {
+  font-family: "Nunito Sans";
+  src: url("./assets/fonts/NunitoSans-Regular.ttf") format("ttf");
+  font-weight: 400;
+  font-style: normal;
 }

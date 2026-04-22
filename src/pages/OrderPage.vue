@@ -1,3 +1,6 @@
+<script setup>
+import HomePageButton from '@/components/HomePageButton.vue';
+</script>
 <template>
-  Order page
+  <HomePageButton />
 </template>

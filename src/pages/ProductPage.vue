@@ -1,34 +1,16 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { getSiteSettings } from '@/api'
-import type { SiteSettings } from '@/api'
+import { storeToRefs } from 'pinia'
+import { useSiteSettingsStore } from '@/stores/siteSettings'
+import HomePageButton from '@/components/HomePageButton.vue';
 
-const siteSettings = ref<SiteSettings | null>(null)
-const isLoading = ref(false)
-const errorMessage = ref('')
-
-async function loadProductPageData() {
-  isLoading.value = true
-  errorMessage.value = ''
-
-  try {
-    siteSettings.value = await getSiteSettings()
-  } catch (error) {
-    errorMessage.value =
-      error instanceof Error ? error.message : 'Не удалось загрузить site_settings.'
-  } finally {
-    isLoading.value = false
-  }
-}
-
-onMounted(() => {
-  loadProductPageData()
-})
+const siteSettingsStore = useSiteSettingsStore()
+const { errorMessage, isLoading, siteSettings } = storeToRefs(siteSettingsStore)
 </script>
 
 <template>
   <section>
-    <h1>Product page</h1>
+
+    <HomePageButton />
 
     <p v-if="isLoading">Загрузка данных...</p>
     <p v-else-if="errorMessage">{{ errorMessage }}</p>
