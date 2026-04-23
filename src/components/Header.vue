@@ -207,10 +207,22 @@ header {
     display: none;
   }
 
+  .clickable-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .cart-badge {
+    width: 14px;
+    height: 14px;
+  }
+
   #mobile_header {
     height: 100px;
     display: flex;
     flex-direction: column;
+    justify-content: unset;
+    gap: 0;
   }
 
   .logo {
@@ -234,8 +246,14 @@ header {
     align-items: center;
     justify-content: space-between;
     width: 100%;
+    height: 50px;
     position: relative;
     padding: 0 var(--section-padding);
+  }
+
+  .vertical-devider {
+    height: 50px;
+
   }
 }
 </style>

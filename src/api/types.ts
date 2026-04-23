@@ -69,3 +69,47 @@ export interface CartOrderItem {
   price_snapshot: number
   total_price: number
 }
+
+export interface Order {
+  id: number
+  client_name: string
+  client_phone: string
+  address: string
+  order_items: number[]
+  comment: string
+  pay_option: string
+  status: string
+  creation_time: string
+  total_price: number
+}
+
+export interface OrderItem {
+  id: number
+  order: number | null
+  product: number
+  quantity: number
+  name_snapshot: string
+  price_snapshot: number
+  total_price: number
+}
+
+export interface CreateOrderPayload {
+  client_name: string
+  client_phone: string
+  address: string
+  comment: string
+  pay_option: string
+  status: string
+  creation_time: string
+  total_price: number
+  order_items?: number[]
+}
+
+export interface CreateOrderItemPayload {
+  order: number | null
+  product: number
+  quantity: number
+  name_snapshot: string
+  price_snapshot: number
+  total_price: number
+}

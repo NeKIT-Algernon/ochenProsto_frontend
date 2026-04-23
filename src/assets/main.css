@@ -31,6 +31,22 @@ h2 {
   font-size: var(--font-size-h1);
 }
 
+.main-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--grid-vertical-gap);
+}
+
+.section-area {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-background-card);
+  justify-content: center;
+  padding: var(--section-padding);
+  gap: var(--normal-gap);
+  border-radius: var(--radius);
+}
+
 /* Шрифты */
 @font-face {
   font-family: "Nunito Sans";

@@ -82,7 +82,7 @@ watch(
 </script>
 
 <template>
-  <section id="CartSection">
+  <section class="main-section">
     <HomePageButton />
 
     <div class="title_action">
@@ -94,7 +94,7 @@ watch(
       </button>
     </div>
 
-    <div id="cart">
+    <div class="section-area">
       <span v-if="items.length === 0">В корзине пока ничего нет</span>
 
       <div v-else class="items-group">
@@ -159,23 +159,6 @@ watch(
 </template>
 
 <style scoped>
-#CartSection {
-  display: flex;
-  flex-direction: column;
-  gap: var(--grid-vertical-gap);
-}
-
-#cart {
-  display: flex;
-  flex-direction: column;
-  background-color: var(--color-background-card);
-  width: 100%;
-  justify-content: center;
-  padding: var(--section-padding);
-  gap: var(--normal-gap);
-  border-radius: var(--radius);
-}
-
 .title_action {
   display: flex;
   justify-content: space-between;
@@ -246,7 +229,6 @@ watch(
   width: 100%;
   aspect-ratio: 3 / 2;
   background-color: transparent;
-  padding: var(--small-gap);
 }
 
 .cart-item__image {
