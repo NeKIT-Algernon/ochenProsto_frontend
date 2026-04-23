@@ -27,6 +27,10 @@ h2 {
   font-size: var(--font-size-h2);
 }
 
+.title {
+  font-size: var(--font-size-h1);
+}
+
 /* Шрифты */
 @font-face {
   font-family: "Nunito Sans";

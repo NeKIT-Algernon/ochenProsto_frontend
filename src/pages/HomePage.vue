@@ -128,7 +128,7 @@ onMounted(async () => {
       <p v-else-if="banners.length === 0">Баннеров пока нет.</p>
       <BannerSlider v-else :banners="banners" />
     </div>
-    <span id="menu-title">Меню</span>
+    <span class="title">Меню</span>
     <div id="cheap-section">
       <p v-if="isCategoriesLoading">Загрузка категорий...</p>
       <p v-else-if="categoriesErrorMessage">{{ categoriesErrorMessage }}</p>
@@ -162,10 +162,6 @@ onMounted(async () => {
   align-items: center;
   color: var(--color-border-default);
   font-size: var(--font-size-h2);
-}
-
-#menu-title {
-  font-size: var(--font-size-h1);
 }
 
 #categories-sections {

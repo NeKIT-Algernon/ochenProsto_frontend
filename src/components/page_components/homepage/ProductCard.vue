@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
+import { RouterLink } from 'vue-router'
 import { getAssetUrl } from '@/api'
 import { useCartStore } from '@/stores/cart'
 
@@ -38,9 +39,9 @@ function decreaseQuantity() {
 
 <template>
   <div class="product-card">
-    <div class="product-card__image-wrapper">
+    <RouterLink :to="`/product/${productId}`" class="product-card__image-wrapper" :aria-label="`Открыть ${name}`">
       <img v-if="photo" class="product-card__image" :src="getAssetUrl(photo) ?? ''" :alt="name" />
-    </div>
+    </RouterLink>
 
     <div class="product-card__content">
       <span class="product-card__title">{{ name }}</span>
@@ -76,12 +77,13 @@ function decreaseQuantity() {
   background-color: var(--color-background-card);
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius);
-  padding: 0 var(--padding-card) var(--padding-card) var(--padding-card);
+  padding: var(--padding-card);
 }
 
 .product-card__image-wrapper {
+  display: block;
   width: 100%;
-  aspect-ratio: 2 / 1;
+  aspect-ratio: 3 / 2;
   overflow: hidden;
   border-radius: var(--radius) var(--radius) 0 0;
   background-color: var(--color-background-card);
@@ -114,12 +116,12 @@ function decreaseQuantity() {
 }
 
 .product-card__price {
-  font-size: var(--font-size-h4);
+  font-size: var(--font-size-h2);
 }
 
 .product-card__action {
   width: 100%;
-  padding: 2px 8px;
+  padding: 4px 8px;
   border: none;
   border-radius: calc(var(--radius) / 2);
   background-color: var(--color-primary);

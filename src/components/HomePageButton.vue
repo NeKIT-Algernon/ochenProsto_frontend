@@ -27,7 +27,7 @@ import Arrow_left from '@/assets/icons/arrow-left.svg'
 }
 
 .arrow-icon {
-    width: 32px;
-    height: 32px;
+    width: var(--font-size-h1);
+    height: var(--font-size-h1);
 }
 </style>

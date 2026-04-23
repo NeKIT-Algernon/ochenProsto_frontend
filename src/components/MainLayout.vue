@@ -5,7 +5,7 @@ import Header from '@/components/Header.vue'
 
 <template>
   <div class="mainLayout">
-    <Header />
+    <Header id="main-header" />
     <main>
       <slot />
     </main>

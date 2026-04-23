@@ -102,6 +102,16 @@ export const useCartStore = defineStore('cart', () => {
     persistCartItems(items.value)
   }
 
+  function clearCart() {
+    items.value = []
+    persistCartItems(items.value)
+  }
+
+  function removeProduct(productId: number) {
+    items.value = items.value.filter((item) => item.product !== productId)
+    persistCartItems(items.value)
+  }
+
   return {
     items,
     totalItemsCount,
@@ -110,6 +120,8 @@ export const useCartStore = defineStore('cart', () => {
     addProduct,
     increaseQuantity,
     decreaseQuantity,
+    clearCart,
+    removeProduct,
   }
 })
 

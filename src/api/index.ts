@@ -1,7 +1,7 @@
 export { getAssetUrl } from './assets'
 export { getBanners } from './banners'
 export { getCategories } from './categories'
-export { getProductsByCategory } from './products'
+export { getProductById, getProductsByCategory, getProductsByIds } from './products'
 export { getSiteSettings } from './siteSettings'
 export { default as apiClient } from './client'
 export type * from './types'
