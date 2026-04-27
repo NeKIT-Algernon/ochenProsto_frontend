@@ -6,6 +6,14 @@ import { useCartStore } from '@/stores/cart'
 import HomePageButton from '@/components/HomePageButton.vue'
 
 type PayOption = 'card' | 'cash'
+type ApartmentField = 'entrance' | 'floor' | 'apartment'
+
+const NAME_MAX_LENGTH = 40
+const ADDRESS_MAX_LENGTH = 30
+const COMMENT_MAX_LENGTH = 200
+const ENTRANCE_MAX_VALUE = 98
+const FLOOR_MAX_VALUE = 98
+const APARTMENT_MAX_VALUE = 9998
 
 const cartStore = useCartStore()
 const { items } = storeToRefs(cartStore)
@@ -35,8 +43,54 @@ const formattedTotalPrice = computed(() => {
   return new Intl.NumberFormat('ru-RU').format(totalPrice.value)
 })
 
+function parseAddressParts(street: string, house: string) {
+  const normalizedStreet = street.trim()
+  const normalizedHouse = house.trim()
+
+  if (normalizedHouse) {
+    return {
+      street: normalizedStreet,
+      house: normalizedHouse,
+    }
+  }
+
+  // Поле адреса в форме одно, поэтому поддерживаем ввод вида "Ленина, 12".
+  const commaSeparatedParts = normalizedStreet
+    .split(',')
+    .map((part) => part.trim())
+    .filter(Boolean)
+
+  if (commaSeparatedParts.length >= 2) {
+    return {
+      street: commaSeparatedParts.slice(0, -1).join(', '),
+      house: commaSeparatedParts.at(-1) ?? '',
+    }
+  }
+
+  const inlineHouseMatch = normalizedStreet.match(/^(.*\D)\s+(\d+[^\s,/]*)$/)
+
+  if (inlineHouseMatch) {
+    const [, parsedStreet = '', parsedHouse = ''] = inlineHouseMatch
+
+    return {
+      street: parsedStreet.trim(),
+      house: parsedHouse.trim(),
+    }
+  }
+
+  return {
+    street: normalizedStreet,
+    house: '',
+  }
+}
+
+// Держим единый разбор адреса для валидации и payload заказа.
+const normalizedAddress = computed(() => {
+  return parseAddressParts(form.street, form.house)
+})
+
 const fullAddress = computed(() => {
-  const parts = [`ул. ${form.street}`, `дом ${form.house}`]
+  const parts = [`ул. ${normalizedAddress.value.street}`, `дом ${normalizedAddress.value.house}`]
 
   if (form.isPrivateHouse) {
     parts.push('частный дом')
@@ -160,9 +214,24 @@ function onPhoneKeydown(event: KeyboardEvent) {
   }
 }
 
-function onHouseInput(event: Event) {
+// Числовые поля квартиры нормализуем сразу на вводе, чтобы туда не попадал мусор.
+function onApartmentFieldInput(field: ApartmentField, event: Event) {
   const target = event.target as HTMLInputElement
-  form.house = normalizeDigits(target.value)
+  const limits: Record<ApartmentField, number> = {
+    entrance: ENTRANCE_MAX_VALUE,
+    floor: FLOOR_MAX_VALUE,
+    apartment: APARTMENT_MAX_VALUE,
+  }
+  const normalizedValue = normalizeDigits(target.value)
+  const maxValue = limits[field]
+
+  if (!normalizedValue) {
+    form[field] = ''
+    return
+  }
+
+  const numericValue = Number(normalizedValue)
+  form[field] = Number.isFinite(numericValue) ? String(Math.min(numericValue, maxValue)) : ''
 }
 
 function extractEntityId(payload: unknown) {
@@ -198,12 +267,46 @@ function validateForm() {
     return 'Корзина пуста.'
   }
 
-  if (!form.street.trim() || !form.house.trim()) {
+  if (!form.street.trim()) {
     return 'Заполните адрес.'
   }
 
-  if (!form.isPrivateHouse && (!form.entrance.trim() || !form.floor.trim() || !form.apartment.trim())) {
-    return 'Заполните данные квартиры.'
+  if (form.clientName.trim().length > NAME_MAX_LENGTH) {
+    return `Имя не должно быть длиннее ${NAME_MAX_LENGTH} символов.`
+  }
+
+  if (form.street.trim().length > ADDRESS_MAX_LENGTH) {
+    return `Адрес не должен быть длиннее ${ADDRESS_MAX_LENGTH} символов.`
+  }
+
+  if (form.comment.trim().length > COMMENT_MAX_LENGTH) {
+    return `Комментарий не должен быть длиннее ${COMMENT_MAX_LENGTH} символов.`
+  }
+
+  if (!form.isPrivateHouse) {
+    if (!form.entrance.trim()) {
+      return 'Заполните подъезд.'
+    }
+
+    if (!form.floor.trim()) {
+      return 'Заполните этаж.'
+    }
+
+    if (!form.apartment.trim()) {
+      return 'Заполните квартиру.'
+    }
+
+    if (!/^\d+$/.test(form.entrance) || Number(form.entrance) > ENTRANCE_MAX_VALUE) {
+      return `Подъезд должен содержать только цифры и быть меньше 99.`
+    }
+
+    if (!/^\d+$/.test(form.floor) || Number(form.floor) > FLOOR_MAX_VALUE) {
+      return `Этаж должен содержать только цифры и быть меньше 99.`
+    }
+
+    if (!/^\d+$/.test(form.apartment) || Number(form.apartment) > APARTMENT_MAX_VALUE) {
+      return `Квартира должна содержать только цифры и быть меньше 9999.`
+    }
   }
 
   if (!form.clientName.trim() || !form.clientPhone.trim()) {
@@ -232,15 +335,12 @@ async function submitOrder() {
       address: fullAddress.value,
       comment: form.comment.trim(),
       pay_option: form.payOption,
-      status: 'new',
+      status: 'Оформлен',
       creation_time: getCurrentTime(),
       total_price: totalPrice.value,
     })
 
     const orderId = extractEntityId(orderResponse.data.data)
-
-    console.log(orderResponse.data)
-
     if (orderId === null) {
       throw new Error('Не удалось получить id заказа.')
     }
@@ -281,7 +381,8 @@ async function submitOrder() {
       <div class="order-form__grid">
         <label class="order-form__field" id="address">
           <span>Улица, дом</span>
-          <input v-model="form.street" type="text" autocomplete="street-address" placeholder="Ленина, 12">
+          <input v-model="form.street" type="text" autocomplete="street-address" placeholder="Ленина, 12"
+            :maxlength="ADDRESS_MAX_LENGTH">
         </label>
       </div>
 
@@ -292,18 +393,21 @@ async function submitOrder() {
 
       <div v-if="!form.isPrivateHouse" class="order-form__grid">
         <label class="order-form__field" id="enter">
-          <span>Парадная</span>
-          <input v-model="form.entrance" type="text" placeholder="2">
+          <span>Подъезд</span>
+          <input v-model="form.entrance" type="text" inputmode="numeric" placeholder="2" maxlength="2"
+            @input="onApartmentFieldInput('entrance', $event)">
         </label>
 
         <label class="order-form__field" id="floor">
           <span>Этаж</span>
-          <input v-model="form.floor" type="text" placeholder="5">
+          <input v-model="form.floor" type="text" inputmode="numeric" placeholder="5" maxlength="2"
+            @input="onApartmentFieldInput('floor', $event)">
         </label>
 
         <label class="order-form__field" id="apartment">
           <span>Квартира</span>
-          <input v-model="form.apartment" type="text" placeholder="47">
+          <input v-model="form.apartment" type="text" inputmode="numeric" placeholder="47" maxlength="4"
+            @input="onApartmentFieldInput('apartment', $event)">
         </label>
       </div>
 
@@ -312,7 +416,8 @@ async function submitOrder() {
       <div class="order-form__grid">
         <label class="order-form__field" id="name">
           <span>Имя</span>
-          <input v-model="form.clientName" type="text" autocomplete="name" placeholder="Иван">
+          <input v-model="form.clientName" type="text" autocomplete="name" placeholder="Иван"
+            :maxlength="NAME_MAX_LENGTH">
         </label>
 
         <label class="order-form__field" id="phone">
@@ -326,11 +431,11 @@ async function submitOrder() {
       <h2 class="order-form__subtitle">Детали</h2>
       <label class="order-form__field">
         <span>Комментарий</span>
-        <textarea v-model="form.comment" rows="4" placeholder="Позвоните за 10 минут" />
+        <textarea v-model="form.comment" rows="4" placeholder="Позвоните за 10 минут"
+          :maxlength="COMMENT_MAX_LENGTH" />
       </label>
       <div class="order-form__field">
         <div class="order-form__radio-group">
-
 
           <label class="order-form__radio">
             <input v-model="form.payOption" type="radio" value="Картой">
@@ -360,7 +465,7 @@ async function submitOrder() {
 
     <div v-if="isSuccessModalOpen" class="order-modal">
       <div class="order-modal__content">
-        <p>Ваш заказ успешно оформлен. Скоро вам позвонит менеджер для подтверждения.</p>
+        <p style="text-align: center;">Ваш заказ успешно оформлен. Скоро вам позвонит менеджер для подтверждения.</p>
         <button class="order-modal__button" type="button" @click="isSuccessModalOpen = false">
           Закрыть
         </button>
@@ -370,6 +475,10 @@ async function submitOrder() {
 </template>
 
 <style scoped>
+label>span {
+  font-size: calc(var(--font-size-normal)*0.7);
+}
+
 .order-page__title,
 .order-form__subtitle {
   font-size: var(--font-size-normal);
@@ -399,13 +508,13 @@ async function submitOrder() {
 .order-form__grid {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 16px;
+  gap: var(--small-gap);
 }
 
 .order-form__field {
   display: flex;
   flex-direction: column;
-  gap: 4px
+  gap: 4px;
 }
 
 .order-form__field input,
@@ -414,7 +523,7 @@ async function submitOrder() {
   border: 1px solid var(--color-border-default);
   border-radius: calc(var(--radius) / 2);
   background-color: transparent;
-  font: inherit;
+  font-size: calc(var(--font-size-normal)*0.8);
   transition: border-color 0.2s ease;
 }
 

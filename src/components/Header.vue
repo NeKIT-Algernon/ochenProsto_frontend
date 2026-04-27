@@ -44,9 +44,9 @@ const phoneHref = computed(() => {
       <div class="phone-time-info">
         <a v-if="siteSettings" :href="phoneHref" class="phone" aria-label="Телефон для связи">{{
           siteSettings.primary_phone
-          }}</a>
+        }}</a>
         <time v-if="siteSettings" class="time-of-work">{{ siteSettings.start_of_work }} - {{ siteSettings.end_of_work
-        }}</time>
+          }}</time>
       </div>
       <a v-if="siteSettings" :href="siteSettings.VK_link" target="_blank" rel="noopener noreferrer"
         aria-label="Сообщество ВКонтакте">
@@ -64,9 +64,9 @@ const phoneHref = computed(() => {
       <div class="phone-time-info">
         <a v-if="siteSettings" :href="phoneHref" class="phone" aria-label="Телефон для связи">{{
           siteSettings.primary_phone
-          }}</a>
+        }}</a>
         <time v-if="siteSettings" class="time-of-work">{{ siteSettings.start_of_work }} - {{ siteSettings.end_of_work
-        }}</time>
+          }}</time>
       </div>
 
 
@@ -203,13 +203,12 @@ header {
 }
 
 @media (max-width: 768px) {
-  #main_header {
-    display: none;
+  header {
+    border: none;
   }
 
-  .clickable-icon {
-    width: 24px;
-    height: 24px;
+  #main_header {
+    display: none;
   }
 
   .cart-badge {
@@ -218,7 +217,7 @@ header {
   }
 
   #mobile_header {
-    height: 100px;
+    height: 80px;
     display: flex;
     flex-direction: column;
     justify-content: unset;
@@ -254,6 +253,11 @@ header {
   .vertical-devider {
     height: 50px;
 
+  }
+
+  .icon {
+    width: 24px;
+    height: 24px;
   }
 }
 </style>

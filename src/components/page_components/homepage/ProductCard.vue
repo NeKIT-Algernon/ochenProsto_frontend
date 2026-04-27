@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { RouterLink } from 'vue-router'
 import { getAssetUrl } from '@/api'
+import AppImage from '@/components/AppImage.vue'
 import { useCartStore } from '@/stores/cart'
 
 const props = defineProps<{
@@ -16,6 +17,7 @@ const props = defineProps<{
 const cartStore = useCartStore()
 const { items } = storeToRefs(cartStore)
 
+// Карточка сама знает, сколько этого товара уже лежит в корзине.
 const quantityInCart = computed(() => {
   return items.value.find((item) => item.product === props.productId)?.quantity ?? 0
 })
@@ -40,7 +42,7 @@ function decreaseQuantity() {
 <template>
   <div class="product-card">
     <RouterLink :to="`/product/${productId}`" class="product-card__image-wrapper" :aria-label="`Открыть ${name}`">
-      <img v-if="photo" class="product-card__image" :src="getAssetUrl(photo) ?? ''" :alt="name" />
+      <AppImage :src="getAssetUrl(photo)" :alt="name" img-class="product-card__image" loading="lazy" />
     </RouterLink>
 
     <div class="product-card__content">
@@ -113,13 +115,20 @@ function decreaseQuantity() {
 .product-card__title {
   font-size: var(--font-size-h4);
   font-weight: 300;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .product-card__price {
   font-size: var(--font-size-h2);
+  text-wrap: nowrap;
 }
 
 .product-card__action {
+  margin-top: auto;
   width: 100%;
   padding: 4px 8px;
   border: none;
@@ -167,9 +176,16 @@ function decreaseQuantity() {
 
 @media (max-width: 900px) {
   .product-card__content {
+    flex: 1 1 auto;
     justify-content: start;
     flex-direction: column;
     gap: 2px;
+  }
+
+  .product-card__price {
+    align-self: flex-end;
+    text-align: right;
+    margin-top: auto;
   }
 }
 </style>

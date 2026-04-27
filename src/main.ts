@@ -12,13 +12,11 @@ const pinia = createPinia()
 
 app.use(pinia)
 app.use(router)
+app.mount('#app')
 
 const siteSettingsStore = useSiteSettingsStore(pinia)
 
-try {
-  await siteSettingsStore.loadSiteSettings()
-} catch {
+// Не блокируем первый рендер ожиданием API, чтобы не держать белый экран.
+void siteSettingsStore.loadSiteSettings().catch(() => {
   // Store keeps the error state; app boot should continue.
-}
-
-app.mount('#app')
+})

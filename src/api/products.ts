@@ -1,6 +1,13 @@
 import api from './client'
 import type { DirectusListResponse, DirectusQueryParams, DirectusSingletonResponse, Product } from './types'
 
+// Общий запрос списка товаров нужен для случайных подборок и других витрин.
+export function getProducts(params?: DirectusQueryParams) {
+  return api.get<DirectusListResponse<Product>>('/items/products', {
+    params,
+  })
+}
+
 export function getProductsByCategory(categoryId: number, params?: DirectusQueryParams) {
   return api.get<DirectusListResponse<Product>>('/items/products', {
     params: {

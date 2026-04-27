@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { getAssetUrl } from '@/api'
 import type { Banner } from '@/api'
+import AppImage from '@/components/AppImage.vue'
 
 const props = defineProps<{
   banners: Banner[]
@@ -138,8 +139,9 @@ onBeforeUnmount(() => {
   <section class="banner-slider" @mouseenter="stopAutoplay" @mouseleave="startAutoplay">
     <div class="banner-slider__viewport" @touchstart="onTouchStart" @touchend="onTouchEnd">
       <Transition :name="transitionName" mode="out-in">
-        <img v-if="currentBanner" :key="currentBanner.id" class="banner-slider__image"
-          :src="getAssetUrl(currentBanner.primary_photo) ?? ''" :alt="currentBanner.name" />
+        <AppImage v-if="currentBanner" :key="currentBanner.id" class="banner-slider__image-wrapper"
+          :src="getAssetUrl(currentBanner.primary_photo)" :alt="currentBanner.name" img-class="banner-slider__image"
+          loading="eager" fetchpriority="high" />
       </Transition>
 
       <button class="banner-slider__control-zone banner-slider__control-zone--prev" type="button"
@@ -168,13 +170,18 @@ onBeforeUnmount(() => {
   width: 100%;
   aspect-ratio: 1248 / 320;
   overflow: hidden;
+  border-radius: var(--radius);
+}
+
+.banner-slider__image-wrapper {
+  width: 100%;
+  height: 100%;
 }
 
 .banner-slider__image {
   display: block;
   width: 100%;
   height: 100%;
-  overflow: hidden;
   object-fit: cover;
   border-radius: var(--radius);
 }

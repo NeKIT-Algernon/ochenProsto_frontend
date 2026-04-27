@@ -4,6 +4,7 @@ import { storeToRefs } from 'pinia'
 import { RouterLink } from 'vue-router'
 import { getAssetUrl, getProductsByIds } from '@/api'
 import type { Product } from '@/api'
+import AppImage from '@/components/AppImage.vue'
 import { useCartStore } from '@/stores/cart'
 import HomePageButton from '@/components/HomePageButton.vue'
 
@@ -103,12 +104,15 @@ watch(
         </div>
 
         <div v-for="item in cartItemsView" :key="item.id" class="cart-item">
-          <RouterLink :to="`/product/${item.product}`" class="cart-item__image-wrapper"
+          <RouterLink :to="`/product/${item.product}`" class="cart-item__image-link"
             :aria-label="`Открыть ${item.name_snapshot}`">
-            <div class="cart-item__image-wrapper">
-              <img v-if="item.productData?.photo" class="cart-item__image"
-                :src="getAssetUrl(item.productData.photo) ?? ''" :alt="item.name_snapshot">
-            </div>
+            <AppImage
+              class="cart-item__image-wrapper"
+              :src="getAssetUrl(item.productData?.photo)"
+              :alt="item.name_snapshot"
+              img-class="cart-item__image"
+              loading="lazy"
+            />
           </RouterLink>
 
           <div class="cart-item__content">
@@ -116,9 +120,9 @@ watch(
               <span class="cart-item__title">{{ item.name_snapshot }}</span>
               <span class="cart-item__description">{{ item.productData?.ingridients }}</span>
             </div>
-            <span class="cart-item__price">{{
-              formatPrice(item.quantity * item.price_snapshot)
-            }} ₽</span>
+            <span class="cart-item__price">
+              {{ item.quantity }} x {{ formatPrice(item.price_snapshot) }} ₽
+            </span>
           </div>
 
           <div class="cart-item__actions">
@@ -184,17 +188,16 @@ watch(
 
 .checkout-button {
   display: flex;
-  width: 250px;
-  height: 48px;
   justify-content: center;
   align-items: center;
   border-radius: 8px;
   background-color: var(--color-primary);
   color: var(--color-background-main);
   text-decoration: none;
-  font-size: 20px;
+  font-size: var(--font-size-normal);
   margin: 0 auto;
   transition: background-color 0.2s ease;
+  padding: var(--small-gap) var(--normal-gap);
 }
 
 .checkout-button:hover {
@@ -231,6 +234,10 @@ watch(
   background-color: transparent;
 }
 
+.cart-item__image-link {
+  display: block;
+}
+
 .cart-item__image {
   display: block;
   width: 100%;
@@ -255,7 +262,11 @@ watch(
 
 .cart-item__title {
   font-size: var(--font-size-h2);
-  white-space: nowrap;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .cart-item__description {
@@ -317,5 +328,55 @@ watch(
   padding: var(--small-gap);
   line-height: 50%;
   color: var(--color-text-primary);
+}
+
+@media (max-width: 768px) {
+  .cart-item {
+    position: relative;
+    grid-template-columns: calc(var(--logo-height) * 2.5) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .cart-item__image-wrapper {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .cart-item__content {
+    grid-column: 2;
+    grid-row: 1;
+    gap: var(--small-gap);
+    padding-right: calc(var(--logo-height) * 2.4);
+  }
+
+  .cart-item__actions {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: calc(var(--logo-height) * 2);
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: var(--small-gap);
+  }
+
+  .cart-item__counter {
+    width: 100%;
+  }
+
+  .cart-item__counter-button {
+    padding: 2px var(--small-gap);
+  }
+
+  .cart-item__remove-button {
+    padding: 4px;
+    line-height: 1;
+  }
+
+  .checkout-button {
+    width: 180px;
+    height: 32px;
+  }
 }
 </style>

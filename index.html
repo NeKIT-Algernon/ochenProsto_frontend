@@ -1,13 +1,101 @@
 <!DOCTYPE html>
-<html lang="">
+<html lang="ru">
   <head>
     <meta charset="UTF-8">
     <link rel="icon" href="/favicon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Очень Просто - Ст. Ленинградская</title>
+    <meta name="description" content="Доставка суши, роллов и других блюд от Очень Просто в станице Ленинградской.">
+    <meta name="robots" content="index,follow">
+    <meta name="theme-color" content="#FAF7F4">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="ru_RU">
+    <meta property="og:title" content="Очень Просто">
+    <meta property="og:description" content="Доставка суши роллов и других блюд от Очень Просто в станице Ленинградской.">
+    <title>Очень Просто</title>
+    <style>
+      body {
+        margin: 0;
+      }
+
+      #app-loader {
+        min-height: 100vh;
+        padding: 32px 96px;
+        background: #faf7f4;
+        box-sizing: border-box;
+      }
+
+      .boot-skeleton {
+        background: linear-gradient(90deg, rgba(255,255,255,.08) 0%, rgba(255,255,255,.34) 50%, rgba(255,255,255,.08) 100%);
+        background-size: 200% 100%;
+        animation: boot-shimmer 1.2s linear infinite;
+        border-radius: 16px;
+      }
+
+      .boot-skeleton--header {
+        height: 80px;
+        margin-bottom: 32px;
+      }
+
+      .boot-skeleton--banner {
+        width: 100%;
+        aspect-ratio: 1248 / 350;
+        margin-bottom: 32px;
+      }
+
+      .boot-skeleton--line {
+        height: 24px;
+        width: 240px;
+        margin-bottom: 24px;
+      }
+
+      .boot-skeleton-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 24px;
+      }
+
+      .boot-skeleton--card {
+        width: 100%;
+        aspect-ratio: 0.78;
+      }
+
+      @keyframes boot-shimmer {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+      }
+
+      @media (max-width: 1300px) {
+        .boot-skeleton-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 900px) {
+        #app-loader {
+          padding: 24px 32px;
+        }
+
+        .boot-skeleton-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 16px;
+        }
+      }
+    </style>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <div id="app-loader">
+        <div class="boot-skeleton boot-skeleton--header"></div>
+        <div class="boot-skeleton boot-skeleton--banner"></div>
+        <div class="boot-skeleton boot-skeleton--line"></div>
+        <div class="boot-skeleton-grid">
+          <div class="boot-skeleton boot-skeleton--card"></div>
+          <div class="boot-skeleton boot-skeleton--card"></div>
+          <div class="boot-skeleton boot-skeleton--card"></div>
+          <div class="boot-skeleton boot-skeleton--card"></div>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
