@@ -3,6 +3,7 @@ import { computed, reactive, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { createOrder, createOrderItem } from '@/api'
 import { useCartStore } from '@/stores/cart'
+import { useSiteSettingsStore } from '@/stores/siteSettings'
 import HomePageButton from '@/components/HomePageButton.vue'
 
 type PayOption = 'card' | 'cash'
@@ -16,7 +17,9 @@ const FLOOR_MAX_VALUE = 98
 const APARTMENT_MAX_VALUE = 9998
 
 const cartStore = useCartStore()
+const siteSettingsStore = useSiteSettingsStore()
 const { items } = storeToRefs(cartStore)
+const { siteSettings } = storeToRefs(siteSettingsStore)
 
 const form = reactive({
   street: '',
@@ -34,6 +37,11 @@ const form = reactive({
 const isSubmitting = ref(false)
 const errorMessage = ref('')
 const isSuccessModalOpen = ref(false)
+const successMessage = ref('Ваш заказ успешно оформлен. Скоро вам позвонит менеджер для подтверждения.')
+
+const isOrderingClosed = computed(() => {
+  return siteSettings.value?.isClosed === true
+})
 
 const totalPrice = computed(() => {
   return items.value.reduce((sum, item) => sum + item.total_price, 0)
@@ -319,6 +327,12 @@ function validateForm() {
 async function submitOrder() {
   errorMessage.value = ''
 
+  if (isOrderingClosed.value) {
+    successMessage.value = 'К сожалению, мы уже закрыты.'
+    isSuccessModalOpen.value = true
+    return
+  }
+
   const validationError = validateForm()
 
   if (validationError) {
@@ -329,6 +343,14 @@ async function submitOrder() {
   isSubmitting.value = true
 
   try {
+    const freshSiteSettings = await siteSettingsStore.loadSiteSettings(true)
+
+    if (freshSiteSettings?.isClosed) {
+      successMessage.value = 'К сожалению, мы уже закрыты.'
+      isSuccessModalOpen.value = true
+      return
+    }
+
     const orderResponse = await createOrder({
       client_name: form.clientName.trim(),
       client_phone: form.clientPhone.trim(),
@@ -359,6 +381,7 @@ async function submitOrder() {
     )
 
     cartStore.clearCart()
+    successMessage.value = 'Ваш заказ успешно оформлен. Скоро вам позвонит менеджер для подтверждения.'
     isSuccessModalOpen.value = true
   } catch (error) {
     errorMessage.value = extractApiErrorMessage(error)
@@ -459,13 +482,19 @@ async function submitOrder() {
       <p v-if="errorMessage" class="order-form__error">{{ errorMessage }}</p>
     </form>
 
-    <button class="order-form__submit" type="submit" form="order-form" :disabled="isSubmitting || items.length === 0">
+    <button
+      class="order-form__submit"
+      :class="{ 'order-form__submit--closed': isOrderingClosed }"
+      type="submit"
+      form="order-form"
+      :disabled="isSubmitting || items.length === 0 || isOrderingClosed"
+    >
       {{ isSubmitting ? 'Отправка...' : 'Оформить' }}
     </button>
 
     <div v-if="isSuccessModalOpen" class="order-modal">
       <div class="order-modal__content">
-        <p style="text-align: center;">Ваш заказ успешно оформлен. Скоро вам позвонит менеджер для подтверждения.</p>
+        <p style="text-align: center;">{{ successMessage }}</p>
         <button class="order-modal__button" type="button" @click="isSuccessModalOpen = false">
           Закрыть
         </button>
@@ -656,6 +685,10 @@ label>span {
 .order-form__submit:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.order-form__submit--closed {
+  background-color: var(--color-text-secondary);
 }
 
 .order-modal {

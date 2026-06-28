@@ -140,8 +140,8 @@ onBeforeUnmount(() => {
     <div class="banner-slider__viewport" @touchstart="onTouchStart" @touchend="onTouchEnd">
       <Transition :name="transitionName" mode="out-in">
         <AppImage v-if="currentBanner" :key="currentBanner.id" class="banner-slider__image-wrapper"
-          :src="getAssetUrl(currentBanner.primary_photo)" :alt="currentBanner.name" img-class="banner-slider__image"
-          loading="eager" fetchpriority="high" />
+          :src="getAssetUrl(currentBanner.primary_photo, { format: 'webp', width: 1920 })"
+          :alt="currentBanner.name" img-class="banner-slider__image" loading="eager" fetchpriority="high" />
       </Transition>
 
       <button class="banner-slider__control-zone banner-slider__control-zone--prev" type="button"

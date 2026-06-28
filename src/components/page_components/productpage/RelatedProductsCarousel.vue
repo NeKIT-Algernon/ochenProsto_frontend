@@ -98,6 +98,7 @@ watch(
       <div v-for="product in visibleProducts" :key="product.id" class="related-products__item">
         <ProductCard
           :product-id="product.id"
+          :is-available="product.isAvailable"
           :name="product.name"
           :photo="product.photo"
           :price="product.price"

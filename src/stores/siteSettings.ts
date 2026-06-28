@@ -81,6 +81,7 @@ function loadCachedSiteSettings() {
     if (
       typeof parsedValue?.id === 'number' &&
       typeof parsedValue?.primary_phone === 'string' &&
+      typeof parsedValue?.address === 'string' &&
       typeof parsedValue?.start_of_work === 'string' &&
       typeof parsedValue?.end_of_work === 'string'
     ) {

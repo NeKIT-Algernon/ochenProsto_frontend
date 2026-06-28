@@ -19,6 +19,7 @@ export interface DirectusQueryParams {
 
 export interface Category {
   id: number
+  sort: number
   name: string
   products?: number[] | Product[]
 }
@@ -56,6 +57,7 @@ export interface SiteSettings {
   start_of_work: string
   end_of_work: string
   VK_link: string
+  address: string
   warning_text: string
   isWarning: boolean
   isClosed: boolean

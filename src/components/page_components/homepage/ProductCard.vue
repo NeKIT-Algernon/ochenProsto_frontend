@@ -5,6 +5,7 @@ import { RouterLink } from 'vue-router'
 import { getAssetUrl } from '@/api'
 import AppImage from '@/components/AppImage.vue'
 import { useCartStore } from '@/stores/cart'
+import { capitalizeBackendText } from '@/utils/text'
 
 const props = defineProps<{
   productId: number
@@ -12,10 +13,12 @@ const props = defineProps<{
   photo: string | null
   price: number
   priceFormatted: string
+  isAvailable: boolean
 }>()
 
 const cartStore = useCartStore()
 const { items } = storeToRefs(cartStore)
+const displayName = computed(() => capitalizeBackendText(props.name))
 
 // Карточка сама знает, сколько этого товара уже лежит в корзине.
 const quantityInCart = computed(() => {
@@ -23,14 +26,22 @@ const quantityInCart = computed(() => {
 })
 
 function addToCart() {
+  if (!props.isAvailable) {
+    return
+  }
+
   cartStore.addProduct({
     productId: props.productId,
-    name: props.name,
+    name: displayName.value,
     price: props.price,
   })
 }
 
 function increaseQuantity() {
+  if (!props.isAvailable) {
+    return
+  }
+
   cartStore.increaseQuantity(props.productId)
 }
 
@@ -41,17 +52,29 @@ function decreaseQuantity() {
 
 <template>
   <div class="product-card">
-    <RouterLink :to="`/product/${productId}`" class="product-card__image-wrapper" :aria-label="`Открыть ${name}`">
-      <AppImage :src="getAssetUrl(photo)" :alt="name" img-class="product-card__image" loading="lazy" />
+    <RouterLink :to="`/product/${productId}`" class="product-card__image-wrapper" :aria-label="`Открыть ${displayName}`">
+      <AppImage
+        :src="getAssetUrl(photo, { format: 'webp', width: 1440 })"
+        :alt="displayName"
+        img-class="product-card__image"
+        loading="lazy"
+      />
     </RouterLink>
 
     <div class="product-card__content">
-      <span class="product-card__title">{{ name }}</span>
+      <span class="product-card__title">{{ displayName }}</span>
       <span class="product-card__price">{{ priceFormatted }} ₽</span>
     </div>
 
-    <button v-if="quantityInCart === 0" class="product-card__action" type="button" aria-label="Добавить товар"
-      @click="addToCart">
+    <button
+      v-if="quantityInCart === 0"
+      class="product-card__action"
+      :class="{ 'product-card__action--disabled': !isAvailable }"
+      type="button"
+      aria-label="Добавить товар"
+      :disabled="!isAvailable"
+      @click="addToCart"
+    >
       +
     </button>
 
@@ -63,8 +86,14 @@ function decreaseQuantity() {
 
       <span class="product-card__counter-value">{{ quantityInCart }}</span>
 
-      <button class="product-card__counter-button" type="button" aria-label="Увеличить количество"
-        @click="increaseQuantity">
+      <button
+        class="product-card__counter-button"
+        :class="{ 'product-card__counter-button--disabled': !isAvailable }"
+        type="button"
+        aria-label="Увеличить количество"
+        :disabled="!isAvailable"
+        @click="increaseQuantity"
+      >
         +
       </button>
     </div>
@@ -144,6 +173,13 @@ function decreaseQuantity() {
   background-color: var(--color-hover);
 }
 
+.product-card__action--disabled,
+.product-card__action--disabled:hover {
+  background-color: var(--color-background-card);
+  color: var(--color-text-secondary);
+  cursor: default;
+}
+
 .product-card__counter {
   display: flex;
   align-items: center;
@@ -167,6 +203,11 @@ function decreaseQuantity() {
   color: inherit;
   cursor: pointer;
   font-size: var(--font-size-h2);
+}
+
+.product-card__counter-button--disabled {
+  color: var(--color-text-secondary);
+  cursor: default;
 }
 
 .product-card__counter-value {

@@ -15,6 +15,7 @@ const cartStore = useCartStore()
 const { siteSettings, isLoading } = storeToRefs(siteSettingsStore)
 const { totalItemsCount } = storeToRefs(cartStore)
 
+// Для tel-ссылки оставляем только символы, которые браузер корректно наберет.
 const phoneHref = computed(() => {
   if (!siteSettings.value?.primary_phone) {
     return '#'
@@ -28,8 +29,8 @@ const phoneHref = computed(() => {
 <template>
   <header id="main_header">
     <div class="delivery-info">
-      <div class="info-line">
-        <LocationIcon class="icon" /> Cт. Ленинградская
+      <div class="info-line" v-if="siteSettings">
+        <LocationIcon class="icon" /> {{ siteSettings.address }}
       </div>
       <span class="info-line" v-if="siteSettings">
         <CarIcon class="icon" />Доставка от {{ siteSettings.free_delivery_amount }}&#8381; - бесплатно
@@ -91,8 +92,8 @@ const phoneHref = computed(() => {
       <span class="info-line" v-if="siteSettings">
         <CarIcon class="icon" />Доставка от {{ siteSettings.free_delivery_amount }}&#8381; - бесплатно
       </span>
-      <div class="info-line">
-        <LocationIcon class="icon" /> Cт. Ленинградская
+      <div class="info-line" v-if="siteSettings">
+        <LocationIcon class="icon" /> {{ siteSettings.address }}
       </div>
 
     </div>

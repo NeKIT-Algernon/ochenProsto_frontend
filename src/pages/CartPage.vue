@@ -6,12 +6,20 @@ import { getAssetUrl, getProductsByIds } from '@/api'
 import type { Product } from '@/api'
 import AppImage from '@/components/AppImage.vue'
 import { useCartStore } from '@/stores/cart'
+import { useSiteSettingsStore } from '@/stores/siteSettings'
 import HomePageButton from '@/components/HomePageButton.vue'
+import { capitalizeBackendText } from '@/utils/text'
 
 const cartStore = useCartStore()
+const siteSettingsStore = useSiteSettingsStore()
 const { items } = storeToRefs(cartStore)
+const { siteSettings } = storeToRefs(siteSettingsStore)
 const productsById = ref<Record<number, Product>>({})
 const isProductsLoading = ref(false)
+
+const isOrderingClosed = computed(() => {
+  return siteSettings.value?.isClosed === true
+})
 
 const totalPrice = computed(() => {
   return items.value.reduce((sum, item) => sum + item.total_price, 0)
@@ -105,11 +113,11 @@ watch(
 
         <div v-for="item in cartItemsView" :key="item.id" class="cart-item">
           <RouterLink :to="`/product/${item.product}`" class="cart-item__image-link"
-            :aria-label="`Открыть ${item.name_snapshot}`">
+            :aria-label="`Открыть ${capitalizeBackendText(item.name_snapshot)}`">
             <AppImage
               class="cart-item__image-wrapper"
-              :src="getAssetUrl(item.productData?.photo)"
-              :alt="item.name_snapshot"
+              :src="getAssetUrl(item.productData?.photo, { format: 'webp', width: 1440 })"
+              :alt="capitalizeBackendText(item.name_snapshot)"
               img-class="cart-item__image"
               loading="lazy"
             />
@@ -117,7 +125,7 @@ watch(
 
           <div class="cart-item__content">
             <div class="cart-item__text">
-              <span class="cart-item__title">{{ item.name_snapshot }}</span>
+              <span class="cart-item__title">{{ capitalizeBackendText(item.name_snapshot) }}</span>
               <span class="cart-item__description">{{ item.productData?.ingridients }}</span>
             </div>
             <span class="cart-item__price">
@@ -155,7 +163,14 @@ watch(
       </div>
 
     </div>
-    <RouterLink v-if="items.length > 0" to="/order" class="checkout-button">
+    <RouterLink
+      v-if="items.length > 0"
+      to="/order"
+      class="checkout-button"
+      :class="{ 'checkout-button--disabled': isOrderingClosed }"
+      :aria-disabled="isOrderingClosed"
+      @click.prevent="isOrderingClosed && $event.preventDefault()"
+    >
       К оформлению
     </RouterLink>
   </section>
@@ -202,6 +217,12 @@ watch(
 
 .checkout-button:hover {
   background-color: var(--color-hover);
+}
+
+.checkout-button--disabled,
+.checkout-button--disabled:hover {
+  background-color: var(--color-text-secondary);
+  cursor: not-allowed;
 }
 
 .horizontal-devider {

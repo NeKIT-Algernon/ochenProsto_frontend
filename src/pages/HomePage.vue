@@ -86,10 +86,12 @@ async function loadCategories() {
     // Главную собираем из одного запроса категорий и одного запроса товаров, чтобы не ждать N запросов по категориям.
     const [categoriesResponse, productsResponse] = await Promise.all([
       getCategories({
-        sort: ['name'],
+        sort: ['sort'],
+        limit: -1,
       }),
       getProducts({
         sort: ['name'],
+        limit: -1,
         filter: {
           isHidden: {
             _eq: false,

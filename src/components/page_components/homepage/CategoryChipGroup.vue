@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import CategoryChip from './CategoryChip.vue'
 import type { Category } from '@/api'
+import { capitalizeBackendText } from '@/utils/text'
 
 const props = defineProps<{
   categories: Category[]
@@ -36,7 +37,7 @@ function resetChips() {
 
 <template>
   <div class="category-chip-group">
-    <CategoryChip v-for="category in categories" :key="category.id" :label="category.name"
+    <CategoryChip v-for="category in categories" :key="category.id" :label="capitalizeBackendText(category.name)"
       :checked="selectedIds.includes(category.id)" :disabled="disabled" @toggle="toggleChip(category.id)" />
 
     <button class="category-chip-group__reset" type="button" aria-label="Сбросить выбранные категории"

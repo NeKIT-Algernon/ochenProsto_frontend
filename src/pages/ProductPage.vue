@@ -9,6 +9,7 @@ import HomePageButton from '@/components/HomePageButton.vue'
 import RelatedProductsCarousel from '@/components/page_components/productpage/RelatedProductsCarousel.vue'
 import { useCartStore } from '@/stores/cart'
 import { updateSeo } from '@/utils/seo'
+import { capitalizeBackendText } from '@/utils/text'
 
 const route = useRoute()
 const cartStore = useCartStore()
@@ -46,6 +47,10 @@ const formattedWeightAndCount = computed(() => {
   return `${product.value.weight} г`
 })
 
+const displayProductName = computed(() => {
+  return capitalizeBackendText(product.value?.name)
+})
+
 // На странице товара используем ту же механику корзины, что и в карточках.
 const quantityInCart = computed(() => {
   if (productId.value === null) {
@@ -56,19 +61,19 @@ const quantityInCart = computed(() => {
 })
 
 function addToCart() {
-  if (!product.value) {
+  if (!product.value || !product.value.isAvailable) {
     return
   }
 
   cartStore.addProduct({
     productId: product.value.id,
-    name: product.value.name,
+    name: displayProductName.value,
     price: product.value.price,
   })
 }
 
 function increaseQuantity() {
-  if (productId.value === null) {
+  if (productId.value === null || !product.value?.isAvailable) {
     return
   }
 
@@ -98,7 +103,7 @@ async function loadProduct() {
     product.value = response.data.data
 
     updateSeo({
-      title: product.value.name,
+      title: capitalizeBackendText(product.value.name),
       description: product.value.description || `Состав: ${product.value.ingridients}`,
       path: route.path,
     })
@@ -138,8 +143,8 @@ onMounted(() => {
       <div v-else class="product-page__content">
         <div class="product-page__image-wrapper">
           <AppImage
-            :src="getAssetUrl(product.photo)"
-            :alt="product.name"
+            :src="getAssetUrl(product.photo, { format: 'webp', width: 1440 })"
+            :alt="displayProductName"
             img-class="product-page__image"
             loading="eager"
             fetchpriority="high"
@@ -149,17 +154,17 @@ onMounted(() => {
         <div class="produc-page__maincontant">
           <div class="product-page__info">
             <div class="product-page__headline">
-              <h1 class="product-page__title">{{ product.name }}</h1>
+              <h1 class="product-page__title">{{ displayProductName }}</h1>
               <span class="product-page__weight">{{ formattedWeightAndCount }}</span>
             </div>
 
             <div class="product-page__divider"></div>
 
-            <p class="product-page__description">{{ product.description }}</p>
             <p class="product-page__ingredients">Состав: {{ product.ingridients }}</p>
 
             <div class="product-page__divider"></div>
 
+            <span class="product-page__nutrition-caption">КБЖУ на 100г:</span>
             <div class="product-page__nutrition">
               <div class="product-page__nutrition-item">
                 <span class="product-page__nutrition-value">{{ product.calories }}</span>
@@ -184,7 +189,14 @@ onMounted(() => {
             </div>
           </div>
 
-          <button v-if="quantityInCart === 0" class="product-page__action" type="button" @click="addToCart">
+          <button
+            v-if="quantityInCart === 0"
+            class="product-page__action"
+            :class="{ 'product-page__action--disabled': !product.isAvailable }"
+            type="button"
+            :disabled="!product.isAvailable"
+            @click="addToCart"
+          >
             Добавить за {{ formattedPrice }} ₽
           </button>
 
@@ -196,8 +208,14 @@ onMounted(() => {
 
             <span class="product-page__counter-value">{{ quantityInCart }}</span>
 
-            <button class="product-page__counter-button" type="button" aria-label="Увеличить количество"
-              @click="increaseQuantity">
+            <button
+              class="product-page__counter-button"
+              :class="{ 'product-page__counter-button--disabled': !product.isAvailable }"
+              type="button"
+              aria-label="Увеличить количество"
+              :disabled="!product.isAvailable"
+              @click="increaseQuantity"
+            >
               +
             </button>
           </div>
@@ -274,11 +292,12 @@ onMounted(() => {
   color: var(--color-text-secondary);
 }
 
-.product-page__description {
+.product-page__ingredients {
   font-size: var(--font-size-primary);
+  color: var(--color-text-primary);
 }
 
-.product-page__ingredients {
+.product-page__nutrition-caption {
   font-size: var(--font-size-primary);
   color: var(--color-text-secondary);
 }
@@ -327,6 +346,13 @@ onMounted(() => {
   background-color: var(--color-hover);
 }
 
+.product-page__action--disabled,
+.product-page__action--disabled:hover {
+  background-color: var(--color-background-card);
+  color: var(--color-text-secondary);
+  cursor: default;
+}
+
 .produc-page__maincontant {
   padding-top: var(--small-gap);
   display: flex;
@@ -356,6 +382,11 @@ onMounted(() => {
   color: inherit;
   cursor: pointer;
   font-size: var(--font-size-h2);
+}
+
+.product-page__counter-button--disabled {
+  color: var(--color-text-secondary);
+  cursor: default;
 }
 
 .product-page__counter-value {

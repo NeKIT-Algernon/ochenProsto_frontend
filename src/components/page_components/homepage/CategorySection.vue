@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import ProductCard from './ProductCard.vue'
 import type { Product } from '@/api'
+import { capitalizeBackendText } from '@/utils/text'
 
+// Секция получает уже сгруппированные товары и только отрисовывает сетку карточек.
 defineProps<{
   title: string
   products: Product[]
@@ -10,13 +12,14 @@ defineProps<{
 
 <template>
   <section class="category-section">
-    <span class="category-section__title">{{ title }}</span>
+    <span class="category-section__title">{{ capitalizeBackendText(title) }}</span>
 
     <div class="category-section__products">
       <ProductCard
         v-for="product in products"
         :key="product.id"
         :product-id="product.id"
+        :is-available="product.isAvailable"
         :name="product.name"
         :photo="product.photo"
         :price="product.price"
