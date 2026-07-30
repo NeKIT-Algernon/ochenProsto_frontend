@@ -60,7 +60,7 @@ function resetChips() {
   padding: 8px 12px;
   border: 1px solid var(--color-border-default);
   border-radius: 50%;
-  background-color: transparent;
+  background-color: var(--color-background-card);
   cursor: pointer;
   transition:
     background-color 0.2s ease,

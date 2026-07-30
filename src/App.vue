@@ -32,19 +32,17 @@ import MainLayout from '@/components/MainLayout.vue'
 .route-fallback__banner,
 .route-fallback__line,
 .route-fallback__card {
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.08) 0%,
-    rgba(255, 255, 255, 0.34) 50%,
-    rgba(255, 255, 255, 0.08) 100%
-  );
+  background: linear-gradient(90deg,
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(255, 255, 255, 0.34) 50%,
+      rgba(255, 255, 255, 0.08) 100%);
   background-size: 200% 100%;
   animation: route-fallback-shimmer 1.2s linear infinite;
 }
 
 .route-fallback__banner {
   width: 100%;
-  aspect-ratio: 1248 / 350;
+  aspect-ratio: 16 / 9;
   border-radius: var(--radius);
 }
 

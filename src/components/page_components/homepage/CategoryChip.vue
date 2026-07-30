@@ -22,7 +22,7 @@ const emit = defineEmits<{
   padding: 8px 16px;
   border: 1px solid var(--color-border-default);
   border-radius: 999px;
-  background-color: transparent;
+  background-color: var(--color-background-card);
   color: var(--color-text-primary);
   cursor: pointer;
   transition:

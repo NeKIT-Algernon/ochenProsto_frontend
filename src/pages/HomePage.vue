@@ -195,19 +195,17 @@ onMounted(() => {
 }
 
 .homepage-skeleton {
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.08) 0%,
-    rgba(255, 255, 255, 0.34) 50%,
-    rgba(255, 255, 255, 0.08) 100%
-  );
+  background: linear-gradient(90deg,
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(255, 255, 255, 0.34) 50%,
+      rgba(255, 255, 255, 0.08) 100%);
   background-size: 200% 100%;
   animation: homepage-skeleton-shimmer 1.2s linear infinite;
 }
 
 .homepage-skeleton--banner {
   width: 100%;
-  aspect-ratio: 1248 / 350;
+  aspect-ratio: 16 / 9;
   border-radius: var(--radius);
 }
 
